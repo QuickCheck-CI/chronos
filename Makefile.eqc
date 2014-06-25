@@ -7,5 +7,5 @@ download_deps: $(ALL_DEPS_DIRS) $(ALL_TEST_DEPS_DIRS)
 patch_deps:
 	sed -i.bak 's/skip_deps=true eunit/skip_deps=true compile_only=true eunit/g' $(DEPS_DIR)/meck/Makefile
 
-eqc: download_deps patch_deps app build-tests
+eqc: download_deps patch_deps app deps build-tests
 
