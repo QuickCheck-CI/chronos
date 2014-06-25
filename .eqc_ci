@@ -1,4 +1,4 @@
-{build, "make test_chronos"}.
+{build, "make -f Makefile.eqc eqc"}.
 {test_path, "ebin"}.
 {test_path, "test"}.
 {deps, "deps/edown/ebin"}.
