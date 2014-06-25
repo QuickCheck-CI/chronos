@@ -1,6 +1,6 @@
 {build, "make -f Makefile.eqc eqc"}.
-{test_path, "ebin"}.
 {test_path, "test"}.
+{deps, "ebin"}.
 {deps, "deps/edown/ebin"}.
 {deps, "deps/gen_leader/ebin"}.
 {deps, "deps/gproc/ebin"}.
