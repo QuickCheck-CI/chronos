@@ -23,10 +23,10 @@ initial_state() ->
 api_spec() ->
     #api_spec{
        language = erlang,
-       modules = 
+       modules =
            [ #api_module{
                 name = chronos_command,
-                functions = 
+                functions =
                     [ #api_fun{ name = start_timer, arity=2 },
                       #api_fun{ name = cancel_timer, arity=1 },
                       #api_fun{ name = execute_callback, arity=1 } ]}
@@ -36,8 +36,8 @@ api_spec() ->
 weight(_S, stop_bogus_timer) -> 1;
 weight(_S, start_new_timer) -> 2;
 weight(_S, _) -> 8.
-                                 
-    
+
+
 server_name() ->
     chronos_server.
 
@@ -63,7 +63,7 @@ start_new_timer_callouts(_S, [TimerName, Duration, Ref]) ->
 start_new_timer_next(S, _, [Timer, _Duration, Ref]) ->
     S#state{ started = [ {Timer, Ref} | S#state.started],
              running = [ {Timer, Ref} | S#state.running ]}.
-    
+
 start_new_timer_features(_S, _Args, _Res) ->
     [start_new_timer].
 
@@ -127,7 +127,7 @@ timer_timeout_callouts(_S, _Args) ->
 timer_timeout_next(S, _Res, [TimerName, TRef]) ->
     S#state{
       running = lists:delete({TimerName, TRef}, S#state.running)}.
-    
+
 timer_timeout_features(_S, _Args, _Res) ->
     [timer_timeout].
 
@@ -173,7 +173,7 @@ ms_delta({Mega1, Sec1, Micro1}, {Mega2, Sec2, Micro2}) ->
 %%             end).
 
 check(Duration) ->
-    Self = self(), 
+    Self = self(),
     Pid = spawn( fun () -> checker(Self) end),
     chronos:start_timer(server_name(), some_name, Duration, {?MODULE, timer_expiry, [Pid]}),
     Pid ! start,
@@ -215,20 +215,20 @@ await_expiry_and_reply(From, Start) ->
 
 check_restart(Duration, CancelDuration) ->
     Self = self(),
-    Pid = spawn( fun() -> restart_checker(Self, Duration, CancelDuration) end), 
+    Pid = spawn( fun() -> restart_checker(Self, Duration, CancelDuration) end),
     chronos:start_timer(server_name(), some_name, Duration, {?MODULE, timer_expiry, [Pid]}),
     Pid ! start,
     receive
         {duration, ActualDuration} ->
             ActualDuration
-    after 
+    after
         Duration*2 + CancelDuration ->
             error
     end.
-                          
+
 
 restart_checker(From, Duration, CancelDuration) ->
-    receive 
+    receive
         start ->
             Start = erlang:timestamp(),
             timer:sleep(CancelDuration),
@@ -243,14 +243,15 @@ restart_checker(From, Duration, CancelDuration) ->
 prop_cancel() ->
     ?FORALL({Duration, CancelDuration}, timer_duration_cancel(),
             begin
-                io:format("Module info: ~p\n", [chronos_command:module_info()]),
+                io:format("Module info: ~p\n", [code:which(chronos_command)]),
+                io:format("Path: ~p\n", [code:get_path()]),
                 chronos:start_link(server_name()),
                 Res = listen_after_cancel(Duration, CancelDuration),
                 chronos:stop(server_name()),
                 eqc:equals(Res, nothing_received)
             end).
 
-listen_after_cancel(Duration, CancelDuration) ->        
+listen_after_cancel(Duration, CancelDuration) ->
     Self = self(),
     Pid = spawn( fun() -> cancel_and_listen(Self, Duration, CancelDuration) end),
     chronos:start_timer(server_name(), some_name, Duration, {?MODULE, timer_expiry, [Pid]}),
@@ -259,7 +260,7 @@ listen_after_cancel(Duration, CancelDuration) ->
         {listen_result, Res} ->
             Res
     end.
-                         
+
 cancel_and_listen(From, Duration, CancelDuration) ->
     receive
         start ->
@@ -269,16 +270,16 @@ cancel_and_listen(From, Duration, CancelDuration) ->
     end.
 
 listen(From, ListenPeriod) ->
-    Res = 
+    Res =
         receive
             Msg ->
                 {error, Msg}
-        after 
+        after
             ListenPeriod ->
                 nothing_received
         end,
     From ! {listen_result, Res}.
-            
+
 
 
 %%-------------------- GENERATORS ------------------------------
