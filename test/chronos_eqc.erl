@@ -163,14 +163,14 @@ ms_delta({Mega1, Sec1, Micro1}, {Mega2, Sec2, Micro2}) ->
     (1000000*Mega + Sec) * 1000 + Micro / 1000.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-prop_executes() ->
-    ?FORALL(Duration, timer_duration(),
-            begin
-                chronos:start_link(server_name()),
-                ExpiryDuration = check(Duration),
-                chronos:stop(server_name()),
-                ExpiryDuration >= (Duration*1.0)
-            end).
+%% prop_executes() ->
+%%     ?FORALL(Duration, timer_duration(),
+%%             begin
+%%                 chronos:start_link(server_name()),
+%%                 ExpiryDuration = check(Duration),
+%%                 chronos:stop(server_name()),
+%%                 ExpiryDuration >= (Duration*1.0)
+%%             end).
 
 check(Duration) ->
     Self = self(), 
@@ -203,14 +203,14 @@ await_expiry_and_reply(From, Start) ->
     end.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-prop_restart() ->
-    ?FORALL({Duration, CancelDuration}, timer_duration_cancel(),
-            begin
-                chronos:start_link(server_name()),
-                ExpiryDuration = check_restart(Duration, CancelDuration),
-                chronos:stop(server_name()),
-                ExpiryDuration >= (Duration + CancelDuration)*1.0
-            end).
+%% prop_restart() ->
+%%     ?FORALL({Duration, CancelDuration}, timer_duration_cancel(),
+%%             begin
+%%                 chronos:start_link(server_name()),
+%%                 ExpiryDuration = check_restart(Duration, CancelDuration),
+%%                 chronos:stop(server_name()),
+%%                 ExpiryDuration >= (Duration + CancelDuration)*1.0
+%%             end).
 
 
 check_restart(Duration, CancelDuration) ->
@@ -243,6 +243,7 @@ restart_checker(From, Duration, CancelDuration) ->
 prop_cancel() ->
     ?FORALL({Duration, CancelDuration}, timer_duration_cancel(),
             begin
+                io:format("Module info: ~p\n", [chronos_command:module_info()]),
                 chronos:start_link(server_name()),
                 Res = listen_after_cancel(Duration, CancelDuration),
                 chronos:stop(server_name()),
