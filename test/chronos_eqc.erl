@@ -147,6 +147,9 @@ prop_chronos() ->
 
 setup() ->
     eqc_mocking:start_mocking(api_spec()),
+    timer:sleep(100),
+    io:format("Module info: ~p\n", [code:which(chronos_command)]),
+    io:format("Path: ~p\n", [code:get_path()]),
     fun teardown/0.
 
 teardown() ->
